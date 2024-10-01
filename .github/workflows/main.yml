@@ -1,10 +1,11 @@
 name: Restricted Workflow
 on: [push, pull_request]
 
+permissions: read-all
+
 jobs:
   restricted-job:
     runs-on: ubuntu-latest
-    permissions: read-all
     if: github.actor == 'jho2dot0'
     steps:
       - uses: actions/checkout@v4
