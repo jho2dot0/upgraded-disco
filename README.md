@@ -7,16 +7,14 @@ This project sets up a scalable web application infrastructure on AWS using Terr
 ```
 .
 ├── README.md
-├── .github
-│   └── workflows
-│       └── docker-build-push.yml
 ├── ansible
-│   ├── deploy.yml
-│   └── ansiblereadme.md
+│   ├── ansiblereadme.md
+│   └── deploy.yml
 ├── app
-│   ├── app.py
-│   ├── Dockerfile
-│   └── requirements.txt
+│   ├── Dockerfile
+│   ├── app.py
+│   ├── appreadme.md
+│   └── requirements.txt
 └── terraform
     ├── alb.tf
     ├── backend.tf
