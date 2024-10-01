@@ -63,6 +63,14 @@ resource "aws_security_group" "allow_http" {
     cidr_blocks = ["0.0.0.0/0"] # In production, limit this to CloudFront IP ranges
   }
 
+  ingress {
+    description = "Application port"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # In production, limit this to CloudFront IP ranges
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
