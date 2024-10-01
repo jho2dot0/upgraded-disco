@@ -1,0 +1,11 @@
+name: Restricted Workflow
+on: [push, pull_request]
+
+jobs:
+  restricted-job:
+    runs-on: ubuntu-latest
+    if: github.actor == 'jho2dot0'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run restricted action
+        run: echo "This action can only be run by the repository owner"
