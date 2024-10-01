@@ -1,0 +1,106 @@
+---
+- name: Deploy Docker image from ECR to ECS Fargate
+  hosts: localhost
+  connection: local
+  vars:
+    cluster_name: main-cluster
+    service_name: main-service
+    task_def_name: app
+    container_name: upgraded-disco-app
+    ecr_image: "{{ ecr_repository_url }}:latest"
+    region: us-east-2
+    subnets: "{{ subnet_ids }}"
+    security_groups:
+      - "{{ allow_http_sg_id }}"
+  tasks:
+  - name: Ensure required variables are set
+    assert:
+      that:
+        - ecr_repository_url is defined
+        - subnet_ids is defined
+        - allow_http_sg_id is defined
+        - ecs_task_execution_role_arn is defined
+      fail_msg: "Missing required variables. Make sure to pass them when running the playbook."
+
+  - name: Register new task definition
+    community.aws.ecs_taskdefinition:
+      family: "{{ task_def_name }}"
+      network_mode: awsvpc
+      execution_role_arn: "{{ ecs_task_execution_role_arn }}"
+      containers:
+        - name: "{{ container_name }}"
+          image: "{{ ecr_image }}"
+          essential: true
+          portMappings:
+            - containerPort: 5000
+              hostPort: 5000
+      cpu: "{{ ecs_task_cpu }}"
+      memory: "{{ ecs_task_memory }}"
+      state: present
+      region: "{{ region }}"
+    register: task_definition
+
+  - name: Get current ECS service info
+    community.aws.ecs_service_info:
+      cluster: "{{ cluster_name }}"
+      service: "{{ service_name }}"
+      region: "{{ region }}"
+      details: true
+    register: current_service_info
+  
+  - set_fact:
+      loadbalancers: "{{ current_service_info.services[0].loadBalancers }}"
+    when: current_service_info.services | count
+
+  - name: Update existing ECS service
+    community.aws.ecs_service:
+      state: present
+      name: "{{ service_name }}"
+      cluster: "{{ cluster_name }}"
+      task_definition: "{{ task_definition.taskdefinition.taskDefinitionArn }}"
+      load_balancers: "{{ loadbalancers }}"
+      desired_count: 1
+      launch_type: FARGATE
+      network_configuration:
+        subnets: "{{ subnets }}"
+        security_groups: "{{ security_groups }}"
+        assign_public_ip: yes
+      region: "{{ region }}"
+      force_new_deployment: true
+    when: current_service_info.services | length > 0
+    register: service_update
+
+  - name: Create new ECS service
+    community.aws.ecs_service:
+      state: present
+      name: "{{ service_name }}"
+      cluster: "{{ cluster_name }}"
+      task_definition: "{{ task_definition.taskdefinition.taskDefinitionArn }}"
+      desired_count: 1
+      launch_type: FARGATE
+      network_configuration:
+        subnets: "{{ subnets }}"
+        security_groups: "{{ security_groups }}"
+        assign_public_ip: yes
+      region: "{{ region }}"
+      load_balancers:
+        - targetGroupArn: "{{ target_group_arn }}"
+          containerName: "{{ container_name }}"
+          containerPort: 5000
+    when: current_service_info.services | length == 0
+    register: service_create
+
+  - name: Wait for service to become stable
+    community.aws.ecs_service_info:
+      cluster: "{{ cluster_name }}"
+      service: "{{ service_name }}"
+      region: "{{ region }}"
+      details: true
+    register: service_facts
+    until: service_facts.services[0].runningCount == service_facts.services[0].desiredCount
+    retries: 30
+    delay: 10
+
+  - name: Display service info
+    debug:
+      msg: "Service deployed successfully. Please check the AWS Console for access details."
