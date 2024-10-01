@@ -26,3 +26,23 @@ output "subnet_ids" {
   value       = aws_subnet.main[*].id
   description = "IDs of the subnets"
 }
+
+output "allow_http_sg_id" {
+  value       = aws_security_group.allow_http.id
+  description = "ID of the security group allowing HTTP traffic"
+}
+
+output "ecs_task_execution_role_arn" {
+  value       = aws_iam_role.ecs_task_execution_role.arn
+  description = "ARN of the ECS task execution role"
+}
+
+output "ecs_task_cpu" {
+  value       = var.ecs_task_cpu
+  description = "CPU of the ECS task"
+}
+
+output "ecs_task_memory" {
+  value       = var.ecs_task_memory
+  description = "Memory of the ECS task"
+}
