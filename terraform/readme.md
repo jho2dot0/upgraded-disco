@@ -80,18 +80,18 @@ Before you begin, ensure you have the following:
 5. **S3 Bucket for Terraform State**:
 
    - Create an S3 bucket to store the Terraform state:
-     ```
+     ```bash
      aws s3 mb s3://upgraded-disco-state-bucket --region us-east-2
      ```
    - Enable versioning on the bucket:
-     ```
+     ```bash
      aws s3api put-bucket-versioning --bucket upgraded-disco-state-bucket --versioning-configuration Status=Enabled
      ```
 
 6. **DynamoDB Table for State Locking**:
 
    - Create a DynamoDB table for state locking:
-     ```
+     ```bash
      aws dynamodb create-table \
          --table-name upgraded-disco-state-lock \
          --attribute-definitions AttributeName=LockID,AttributeType=S \
@@ -118,14 +118,14 @@ Before you begin, ensure you have the following:
 
 1. Clone this repository:
 
-   ```
+   ```bash
    git clone https://github.com/jho2dot0/upgraded-disco.git
    cd upgraded-disco
    ```
 
 2. Initialize Terraform:
 
-   ```
+   ```bash
    terraform init
    ```
 
@@ -133,12 +133,12 @@ Before you begin, ensure you have the following:
 
 4. Plan the Terraform changes:
 
-   ```
+   ```bash
    terraform plan
    ```
 
 5. Apply the Terraform configuration:
-   ```
+   ```bash
    terraform apply
    ```
 
