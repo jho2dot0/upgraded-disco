@@ -7,6 +7,9 @@ This project sets up a scalable web application infrastructure on AWS using Terr
 ```
 .
 ├── README.md
+├── .github
+│   └── workflows
+│       └── docker-build-push.yml
 ├── ansible
 │   ├── deploy.yml
 │   └── ansiblereadme.md
@@ -133,6 +136,22 @@ To apply the Terraform configuration:
 2. Initialize Terraform: `terraform init`
 3. Plan the changes: `terraform plan`
 4. Apply the configuration: `terraform apply`
+
+## GitHub Actions
+
+This project includes a GitHub Action workflow (`ecr.yml`) that automates the process of building the Docker image and pushing it to Amazon ECR. The workflow is triggered on pushes to the main branch or can be manually run.
+
+Key steps in the workflow:
+
+1. Checkout the repository
+2. Configure AWS credentials
+3. Login to Amazon ECR
+4. Build, tag, and push the image to Amazon ECR
+
+To use this workflow, ensure you have set up the following secrets in your GitHub repository:
+
+- `AWS_ACCESS_KEY_ID`: Access key for the ecr-upload IAM user
+- `AWS_SECRET_ACCESS_KEY`: Secret key for the ecr-upload IAM user
 
 ## Ansible Deployment
 
