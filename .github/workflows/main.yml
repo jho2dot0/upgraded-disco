@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'jho2dot0'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Run restricted action
         run: echo "This action can only be run by the repository owner"
