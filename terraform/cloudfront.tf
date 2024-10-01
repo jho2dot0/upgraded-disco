@@ -1,6 +1,5 @@
 resource "aws_cloudfront_distribution" "main" {
   enabled             = true
-  default_root_object = "index.html"
 
   origin {
     domain_name = aws_lb.main.dns_name
